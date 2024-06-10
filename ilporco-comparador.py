@@ -29,7 +29,19 @@ def cargar_datos():
     for key in operador.articulos.keys():
         ttk.Label(master=frame_app, text=key).grid(row=2+contador, column=0)
         ttk.Label(master=frame_app, text=operador.articulos[key].nombre).grid(row=2+contador, column=1)
+        ttk.Label(master=frame_app, text=operador.articulos[key].costo).grid(row=2+contador, column=9)
         contador += 1
+
+    # Añadir Scrollbar al mainframe
+    scrollbar = ttk.Scrollbar(main_frame, orient=VERTICAL, command=canvas.yview)
+    scrollbar.pack(side=RIGHT, fill=Y)
+
+    # Configurar canvas
+    canvas.configure(yscrollcommand=scrollbar.set)
+    canvas.bind('<Configure>', lambda e: canvas.configure(scrollregion=canvas.bbox('all')))
+
+def buscar_precios():
+    operador.articulos = operador.inicializar()
 
 # --- CONFIGURACIÓN DE LA GUI PARA EL USO DE SCROLLBARS ---
 
@@ -41,13 +53,7 @@ main_frame.pack(fill=BOTH, expand=1)
 canvas = Canvas(main_frame)
 canvas.pack(side=LEFT, fill=BOTH, expand=1)
 
-# Añadir Scrollbar al canvas
-scrollbar = ttk.Scrollbar(main_frame, orient=VERTICAL, command=canvas.yview)
-scrollbar.pack(side=RIGHT, fill=Y)
 
-# Configurar canvas
-canvas.configure(yscrollcommand=scrollbar.set)
-canvas.bind('<Configure>', lambda e: canvas.configure(scrollregion=canvas.bbox('all')))
 
 # Crear otro frame donde estarán los widgets
 frame_app = Frame(canvas)
@@ -59,18 +65,21 @@ canvas.create_window((0,0), window=frame_app, anchor="nw")
 
 # GUI
 
+# Botones de cargar datos y buscar precios
 ttk.Button(master=frame_app, text='Cargar Datos', command=cargar_datos).grid(row=0, column=1, padx=10, pady=10)
-ttk.Button(master=frame_app, text='Buscar Precios').grid(row=0, column=7, padx=10, pady=10)
+ttk.Button(master=frame_app, text='Buscar Precios', command=buscar_precios).grid(row=0, column=7, padx=10, pady=10)
 
+# Labels de cabecera de la tabla
 ttk.Label(master=frame_app, text='Código').grid(row=1, column=0, padx=10, pady=10)
-ttk.Label(master=frame_app, text='Nombre').grid(row=1, column=1, padx=10, pady=10)
-ttk.Label(master=frame_app, text='Cagnoli').grid(row=1, column=2, padx=10, pady=10)
-ttk.Label(master=frame_app, text='Los Calvos').grid(row=1, column=3, padx=10, pady=10)
-ttk.Label(master=frame_app, text='Nahuel').grid(row=1, column=4, padx=10, pady=10)
-ttk.Label(master=frame_app, text='Doina').grid(row=1, column=5, padx=10, pady=10)
-ttk.Label(master=frame_app, text='Las Dinas').grid(row=1, column=6, padx=10, pady=10)
-ttk.Label(master=frame_app, text='Cabañas Argentinas').grid(row=1, column=7, padx=10, pady=10)
-ttk.Label(master=frame_app, text='Il Porco').grid(row=1, column=8, padx=10, pady=10)
+ttk.Label(master=frame_app, text='Nombre').grid(row=1, column=1, padx=100, pady=10)
+ttk.Label(master=frame_app, text='Cagnoli').grid(row=1, column=2, padx=20, pady=10)
+ttk.Label(master=frame_app, text='Los Calvos').grid(row=1, column=3, padx=20, pady=10)
+ttk.Label(master=frame_app, text='Nahuel').grid(row=1, column=4, padx=20, pady=10)
+ttk.Label(master=frame_app, text='Doina').grid(row=1, column=5, padx=20, pady=10)
+ttk.Label(master=frame_app, text='Las Dinas').grid(row=1, column=6, padx=20, pady=10)
+ttk.Label(master=frame_app, text='Cabañas Argentinas').grid(row=1, column=7, padx=20, pady=10)
+ttk.Label(master=frame_app, text='Otras marcas').grid(row=1, column=8, padx=20, pady=10)
+ttk.Label(master=frame_app, text='Il Porco').grid(row=1, column=9, padx=20, pady=10)
 
 # Activamos el loop principal 
 if __name__ == '__main__':

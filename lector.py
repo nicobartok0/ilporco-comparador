@@ -12,7 +12,8 @@ class Lector:
         self.name = name
         self.wb = load_workbook(ruta, data_only=True)
         self.ws = self.wb[self.wb.sheetnames[0]]
-        #self.intermedia = load_workbook('assets/tabla-intermedia.xlsx')
+        self.intermedia = load_workbook('assets/tabla-intermedia.xlsx')
+        self.wi = self.intermedia.worksheets[self.intermedia.sheetnames[0]]
         self.sku_list = []
         self.name_list = []
         self.cost_list = []
@@ -71,6 +72,9 @@ class Lector:
             articulos.append(articulo)
         
         return articulos
+
+    def intercode(self, articulos:dict):
+        for articulo in articulos.values():
 
 
     def abrir_planilla_resultado(self):
