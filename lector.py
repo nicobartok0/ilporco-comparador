@@ -13,7 +13,7 @@ class Lector:
         self.wb = load_workbook(ruta, data_only=True)
         self.ws = self.wb[self.wb.sheetnames[0]]
         self.intermedia = load_workbook('assets/tabla-intermedia.xlsx')
-        self.wi = self.intermedia.worksheets[self.intermedia.sheetnames[0]]
+        self.wi = self.intermedia.worksheets[0]
         self.sku_list = []
         self.name_list = []
         self.cost_list = []
@@ -41,8 +41,8 @@ class Lector:
     # Método que toma los códigos de los artículos de la segunda columna del excel.
     def obtener_codigo(self):
         for column_data in self.ws['B']:
-            if column_data.value != None:
-                valor = str(column_data.value)
+            if column_data.value != None and type(column_data.value) != str:
+                valor = int(column_data.value)
                 self.code_list.append(valor)
         return self.code_list
     
@@ -74,7 +74,24 @@ class Lector:
         return articulos
 
     def intercode(self, articulos:dict):
+        art_pricely = {}
+        for row in self.wi.rows:
+            if type(row[1].value) is int:
+                art_pricely[row[1].value] = {
+                    'CAGNOLI': row[3].value,
+                    'NAHUEL': row[4].value,
+                    'DOINA': row[5].value,
+                    'LAS DINAS': row[6].value,
+                    'CABAÑAS ARGENTINAS': row[7].value,
+                    'OTROS': row[8].value
+                }
+
         for articulo in articulos.values():
+            if articulo.codigo in art_pricely.keys():
+                for marca in articulo.cods_pricely.keys():
+                    articulo.cods_pricely[marca] = art_pricely[articulo.codigo][marca]
+            print(articulo.cods_pricely)
+        return articulos
 
 
     def abrir_planilla_resultado(self):

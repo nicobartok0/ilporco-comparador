@@ -39,17 +39,26 @@ class Valuador_Pricely(Valuador):
     def cargar_articulos(self, articulos:dict):
         return super().cargar_articulos(articulos)
     
-    
-
-    def buscar_precios(self):
-        for articulo in self.articulos.values():
-            print(f'ARTICULO BUSCADO: {articulo.codigo}:{articulo.nombre}')
-            for marca in articulo.cods_pricely.keys():
+    async def buscar_precio(self, articulo):
+        for marca in articulo.cods_pricely.keys():
                 response = requests.get(f'https://pricely.ar/product/{articulo.cods_pricely[marca]}', cookies=self.cookies, headers=self.headers)
                 soup = BeautifulSoup(response.content, 'html.parser')
                 precio = soup.find('span', {'class': 'font-display text-zinc-700 text-2xl'})
+                print(precio)
                 try:
                     articulo.precios[marca] = unicodedata.normalize('NFKC',precio.text)
-                except:
+                except Exception as e:
                     articulo.precios[marca] = '?'
-            print(f'PRECIOS DE {articulo.nombre}: {articulo.precios}')
+                    print(f'EXCEPT: {e}')
+
+    async def buscar_precios(self):
+        for articulo in self.articulos.values():
+        #    print(f'ARTICULO BUSCADO: {articulo.codigo}:{articulo.nombre}')
+        #    task = asyncio.create_task(self.buscar_precio(articulo))   
+            tasks = asyncio.gather(self.buscar_precio(articulo))
+        await tasks
+
+    def correr_valuador(self):
+        asyncio.run(self.buscar_precios())
+        for articulo in self.articulos.values():
+            print(f'ARTÍCULO {articulo.nombre} PRECIOS: {articulo.precios}')

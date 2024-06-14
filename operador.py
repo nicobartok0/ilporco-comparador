@@ -2,11 +2,18 @@
 from lector import Lector
 from articulo import Articulo
 from valuador import Valuador_Pricely
+#from valuador_asincrono import Valuador_Pricely
+from threading import Thread
 
 class Operador:
     def __init__(self) -> None:
         self.articulos = {}
         self.sesiones = {}
+        
+
+    def definir_hilo_buscador(self):
+        self.hilo_buscador = Thread(target=self.valuador.buscar_precios, daemon=True)
+        #self.hilo_buscador = Thread(target=self.valuador.correr_valuador, daemon=True)
 
     def crear_lector(self, nombre, ruta):
         self.lector = Lector(nombre, ruta)
@@ -22,12 +29,13 @@ class Operador:
             articulo.nombre = articulo_dict['nombre']
             articulo.sku = articulo_dict['SKU']
             articulo.costo = articulo_dict['costo']
-            articulo.codigo = articulo_dict['codigo']
+            articulo.codigo = int(articulo_dict['codigo'])
             self.articulos[articulo.codigo] = articulo
 
     def inicializar(self):
         self.crear_valuador()
         self.valuador.cargar_articulos(self.articulos)
-        self.valuador.buscar_precios()
-        print(self.articulos)
+        self.lector.intercode(self.articulos)
+        self.definir_hilo_buscador()
+        self.hilo_buscador.start()
         return self.articulos
