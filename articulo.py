@@ -14,4 +14,12 @@ class Articulo:
         self.nombre = ''
         self.sku = ''
         self.costo = 0.0
-        self.precios = {}
+        self.precios = {
+            'CAGNOLI': 0,
+            'LOS CALVOS': 0,
+            'NAHUEL': 0,
+            'DOINA': 0,
+            'LAS DINAS': 0,
+            'CABAÑAS ARGENTINAS': 0,
+            'OTROS': 0
+        }

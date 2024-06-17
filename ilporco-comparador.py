@@ -15,6 +15,9 @@ frame.pack()
 #Creamos el operador
 operador = Operador()
 
+#Creamos la matriz donde estarán todas las labels de precios
+pricelabels = [[]]
+
 # Funcionalidades
 
 def cargar_datos():
@@ -25,12 +28,23 @@ def cargar_datos():
     operador.crear_lector(nombre, ruta)
     operador.crear_articulos()
     print(operador.articulos)
-    contador = 0
+    rowcount = 0
+    
     for key in operador.articulos.keys():
-        ttk.Label(master=frame_app, text=key).grid(row=2+contador, column=0)
-        ttk.Label(master=frame_app, text=operador.articulos[key].nombre).grid(row=2+contador, column=1)
-        ttk.Label(master=frame_app, text=operador.articulos[key].costo).grid(row=2+contador, column=9)
-        contador += 1
+        ttk.Label(master=frame_app, text=key).grid(row=2+rowcount, column=0)
+        ttk.Label(master=frame_app, text=operador.articulos[key].nombre).grid(row=2+rowcount, column=1)
+        colcount = 0
+        if len(pricelabels) <= rowcount:
+            pricelabels.append([])
+        for precio in operador.articulos[key].precios.values():
+            label = ttk.Label(master=frame_app, text=precio)
+            pricelabels[rowcount].append(label)
+            label.grid(row=2+rowcount, column=2+colcount)
+            colcount += 1
+
+        ttk.Label(master=frame_app, text=operador.articulos[key].costo).grid(row=2+rowcount, column=9)
+        rowcount += 1
+    print(f'{pricelabels}')
 
     # Añadir Scrollbar al mainframe
     scrollbar = ttk.Scrollbar(main_frame, orient=VERTICAL, command=canvas.yview)
@@ -41,7 +55,20 @@ def cargar_datos():
     canvas.bind('<Configure>', lambda e: canvas.configure(scrollregion=canvas.bbox('all')))
 
 def buscar_precios():
-    operador.articulos = operador.inicializar()
+    operador.articulos = operador.inicializar(frame_app)
+
+def refresh_precios():
+    rowcount = 0
+    for key in operador.articulos.keys():
+        colcount = 0
+        for precio in operador.articulos[key].precios.values():
+            print(f'{rowcount}:{colcount}')
+            pricelabels[rowcount][colcount].config(text=precio)
+            colcount += 1
+        rowcount += 1
+        
+
+
 
 # --- CONFIGURACIÓN DE LA GUI PARA EL USO DE SCROLLBARS ---
 
@@ -57,6 +84,7 @@ canvas.pack(side=LEFT, fill=BOTH, expand=1)
 
 # Crear otro frame donde estarán los widgets
 frame_app = Frame(canvas)
+frame_app.bind('<<ArticleDone>>', lambda e: refresh_precios())
 
 # Crear frame como ventana del canvas
 canvas.create_window((0,0), window=frame_app, anchor="nw")

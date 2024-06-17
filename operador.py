@@ -32,10 +32,12 @@ class Operador:
             articulo.codigo = int(articulo_dict['codigo'])
             self.articulos[articulo.codigo] = articulo
 
-    def inicializar(self):
+    def inicializar(self, frame_app):
         self.crear_valuador()
         self.valuador.cargar_articulos(self.articulos)
+        self.valuador.frame_app = frame_app
         self.lector.intercode(self.articulos)
         self.definir_hilo_buscador()
+        print('Checkpoint 1')
         self.hilo_buscador.start()
         return self.articulos

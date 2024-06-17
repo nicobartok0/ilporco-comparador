@@ -42,14 +42,20 @@ class Valuador_Pricely(Valuador):
     
 
     def buscar_precios(self):
+        print('Checkpoint 2')
         for articulo in self.articulos.values():
             print(f'ARTICULO BUSCADO: {articulo.codigo}:{articulo.nombre}')
             for marca in articulo.cods_pricely.keys():
-                response = requests.get(f'https://pricely.ar/product/{articulo.cods_pricely[marca]}', cookies=self.cookies, headers=self.headers)
-                soup = BeautifulSoup(response.content, 'html.parser')
-                precio = soup.find('span', {'class': 'font-display text-zinc-700 text-2xl'})
-                try:
-                    articulo.precios[marca] = unicodedata.normalize('NFKC',precio.text)
-                except:
-                    articulo.precios[marca] = '?'
+                if articulo.cods_pricely[marca] != None:
+                    response = requests.get(f'https://pricely.ar/product/{articulo.cods_pricely[marca]}', cookies=self.cookies, headers=self.headers)
+                    soup = BeautifulSoup(response.content, 'html.parser')
+                    precio = soup.find('span', {'class': 'font-display text-zinc-700 text-2xl'})
+                    try:
+                        articulo.precios[marca] = unicodedata.normalize('NFKC',precio.text)
+                    except:
+                        articulo.precios[marca] = '?'
+                else:
+                    print(f'ARTÍCULO {articulo.nombre} MARCA {marca} NO BUSCADO: NO TIENE CÓDIGO')
+            self.frame_app.event_generate("<<ArticleDone>>", when="tail")
             print(f'PRECIOS DE {articulo.nombre}: {articulo.precios}')
+            

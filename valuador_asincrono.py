@@ -10,6 +10,9 @@ class Valuador:
 
     def cargar_articulos(self, articulos:Articulo):
         self.articulos = articulos
+
+    def cargar_frame_app(self, frame_app):
+        self.frame_app = frame_app
     
 
 class Valuador_Pricely(Valuador):
@@ -40,21 +43,30 @@ class Valuador_Pricely(Valuador):
         return super().cargar_articulos(articulos)
     
     async def buscar_precio(self, articulo):
+        print(f'Checkpoint 3: {articulo.nombre}')
         for marca in articulo.cods_pricely.keys():
-                response = requests.get(f'https://pricely.ar/product/{articulo.cods_pricely[marca]}', cookies=self.cookies, headers=self.headers)
-                soup = BeautifulSoup(response.content, 'html.parser')
-                precio = soup.find('span', {'class': 'font-display text-zinc-700 text-2xl'})
-                print(precio)
-                try:
-                    articulo.precios[marca] = unicodedata.normalize('NFKC',precio.text)
-                except Exception as e:
+                if articulo.cods_pricely[marca] != None:
+                    print(f'BUSCANDO {articulo.nombre} MARCA {marca}')
+                    response = requests.get(f'https://pricely.ar/product/{articulo.cods_pricely[marca]}', cookies=self.cookies, headers=self.headers)
+                    soup = BeautifulSoup(response.content, 'html.parser')
+                    precio = soup.find('span', {'class': 'font-display text-zinc-700 text-2xl'})
+                    print(precio)
+                    try:
+                        articulo.precios[marca] = unicodedata.normalize('NFKC',precio.text)
+                    except Exception as e:
+                        articulo.precios[marca] = '?'
+                        print(f'EXCEPT: {e}')
+                else:
+                    print(f'ARTICULO {articulo.nombre} MARCA {marca} NO SERÁ BUSCADO')
                     articulo.precios[marca] = '?'
-                    print(f'EXCEPT: {e}')
+                self.frame_app.event_generate("<<ArticleDone>>", when="tail")
 
     async def buscar_precios(self):
+        print('Checkpoint 2')
         for articulo in self.articulos.values():
         #    print(f'ARTICULO BUSCADO: {articulo.codigo}:{articulo.nombre}')
         #    task = asyncio.create_task(self.buscar_precio(articulo))   
+            
             tasks = asyncio.gather(self.buscar_precio(articulo))
         await tasks
 
